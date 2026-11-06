@@ -1,55 +1,52 @@
 name: CI
 
 on:
- push:
-  branches: [main]
- pull_request:
+  push:
+    branches: [main]
+  pull_request:
 
-permissions: 
+permissions:
   contents: read
 
 jobs:
   ci:
-   runs-on: ubuntu-latest
-   steps:
-     - name: Checkout code
-       uses: actions/checkout@v4
-       with:
-         persist-credentials: false
+    runs-on: ubuntu-latest
 
-     - name: Set up Python
-       uses: actions/setup-python@v5
-       with:
-            python-version: "3.12"
-         
-     - name: Install dependencies
-       run: |
-             python -m pip install --upgrade pip
-             python -m pip install -r requirements.txt
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-     - name: Lint code(pylint)
-       run: pylint app tests
-       
-     - name: Lint Dockerfile (hadolint)
-       uses: hadolint/hadolint-action@v3.1.0
-       with:
-           dockerfile: Dockerfile
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-     - name: Unit tests
-       run: python -m pytest -v
-     
-     - name: Build Docker image
-       run: docker build -t hivebox:ci
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
-     - name: Run container and test /version
-       run: |
+      - name: Lint code (pylint)
+        run: PYTHONPATH=. python -m pylint app tests
+
+      - name: Lint Dockerfile (hadolint)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+
+      - name: Unit tests
+        run: python -m pytest -v
+
+      - name: Build Docker image
+        run: docker build -t hivebox:ci .
+
+      - name: Run container and test /version
+        run: |
           docker run -d -p 5000:5000 --name hivebox hivebox:ci
           sleep 5
           EXPECTED=$(python -c "from app.main import VERSION; print(VERSION)")
           ACTUAL=$(curl -s localhost:5000/version)
           echo "Expected: $EXPECTED / Actual: $ACTUAL"
           test "$ACTUAL" = "$EXPECTED"
-       
-        
-   
-   
