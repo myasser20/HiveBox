@@ -4,7 +4,7 @@ WORKDIR /HiveBox
 
 COPY app/ ./app/
 
-RUN useradd --create-home appuser 
+RUN useradd --create-home appuser
 
 USER appuser
 

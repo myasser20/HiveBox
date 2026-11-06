@@ -5,14 +5,16 @@ import requests
 from flask import Flask# the web framework we use to make the app
 VERSION = "v0.0.2"
 BOX_IDS=["5a905949bc2d4100199012b6"]
-API_URL = "https://api.opensensemap.org/boxes/" 
+API_URL = "https://api.opensensemap.org/boxes/"
 
 app = Flask(__name__)
 
 
 def get_temperature(box_id):
     """Get the temperature from the OpenSenseMap API for a given box ID."""
-    box= requests.get(f"{API_URL}{box_id}").json()
+    response = requests.get(f"{API_URL}{box_id}", timeout=10)
+    response.raise_for_status()
+    box = response.json()
     for sensor in box["sensors"]:
         last = sensor.get("lastMeasurement")
         if sensor.get("unit") == "°C" and last:
@@ -44,6 +46,4 @@ def temperature():
 
 
 if __name__ == "__main__":  # true only when you run this file directly
-    app.run(host="0.0.0.0", port=5000)  #
-    
-
+    app.run(host="0.0.0.0", port=5000)
