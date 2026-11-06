@@ -44,9 +44,19 @@ jobs:
 
       - name: Run container and test /version
         run: |
-          docker run -d -p 5000:5000 --name hivebox hivebox:ci
-          sleep 5
-          EXPECTED=$(python -c "from app.main import VERSION; print(VERSION)")
-          ACTUAL=$(curl -s localhost:5000/version)
-          echo "Expected: $EXPECTED / Actual: $ACTUAL"
-          test "$ACTUAL" = "$EXPECTED"
+                  docker run -d -p 5000:5000 --name hivebox hivebox:ci
+                  sleep 5
+              
+                  echo "=== Container Status ==="
+                  docker ps -a
+              
+                  echo "=== Container Logs ==="
+                  docker logs hivebox
+              
+                  EXPECTED=$(python -c "from app.main import VERSION; print(VERSION)")
+                  ACTUAL=$(curl -s http://localhost:5000/version)
+              
+                  echo "Expected: $EXPECTED"
+                  echo "Actual: $ACTUAL"
+              
+                  test "$ACTUAL" = "$EXPECTED"
