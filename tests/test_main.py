@@ -26,3 +26,6 @@ def test_temperature_no_data(_mock):  # test 3
     """/temperature returns 503 when there is no recent data."""
     response = app.test_client().get("/temperature")  # call the endpoint
     assert response.status_code == 503  # we expect "no data" status
+    
+    
+
