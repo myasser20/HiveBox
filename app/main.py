@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta, timezone  # tools to work with dates and times
 
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask# the web framework we use to make the app
 VERSION = "v0.0.2"
 BOX_IDS=["5a905949bc2d4100199012b6"]
 API_URL = "https://api.opensensemap.org/boxes/" 
