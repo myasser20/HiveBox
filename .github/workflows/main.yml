@@ -28,7 +28,7 @@ jobs:
      - name: Lint code(pylint)
        run: pylint app tests
        
-     - name: Lint DOckerfile (hadolint)
+     - name: Lint Dockerfile (hadolint)
        uses: hadolint/hadolint-action@v3.1.0
        with:
            dockerfile: Dockerfile
