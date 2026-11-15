@@ -58,8 +58,8 @@ def temperature():
             temps.append(value)  # add the temperature to the list
     if not temps:  # if the list is empty
         return "No recent data", 503  # tell the caller no data is available
-    
-    avg =str(round(sum(temps) / len(temps), 2)) 
+
+    avg =str(round(sum(temps) / len(temps), 2))
     return jsonify({"average": avg, "status": get_status(avg)}) # average, rounded to 2 decimals
 
 @app.route("/metrics")
