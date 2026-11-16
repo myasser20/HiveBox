@@ -50,7 +50,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=myasser20_HiveBox
-            -Dsonar.organization=YOUR_ORGANIZATION_KEY
+            -Dsonar.organization=myasser20
             -Dsonar.sources=app
             -Dsonar.tests=tests
             -Dsonar.python.coverage.reportPaths=coverage.xml
