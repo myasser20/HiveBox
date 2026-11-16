@@ -1,3 +1,4 @@
+
 name: CI
 
 on:
@@ -17,6 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,6 +29,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
+          python -m pip install pytest-cov
 
       - name: Lint code (pylint)
         run: PYTHONPATH=. python -m pylint app tests
@@ -36,27 +39,41 @@ jobs:
         with:
           dockerfile: Dockerfile
 
-      - name: Unit tests
-        run: python -m pytest -v
+      - name: Unit tests and coverage
+        run: |
+          python -m pytest -v --cov=app --cov-report=xml
+
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarqube-scan-action@v8.3.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=myasser20_HiveBox
+            -Dsonar.organization=YOUR_ORGANIZATION_KEY
+            -Dsonar.sources=app
+            -Dsonar.tests=tests
+            -Dsonar.python.coverage.reportPaths=coverage.xml
+            -Dsonar.python.version=3.12
 
       - name: Build Docker image
         run: docker build -t hivebox:ci .
 
       - name: Run container and test /version
         run: |
-                  docker run -d -p 5000:5000 --name hivebox hivebox:ci
-                  sleep 5
-              
-                  echo "=== Container Status ==="
-                  docker ps -a
-              
-                  echo "=== Container Logs ==="
-                  docker logs hivebox
-              
-                  EXPECTED=$(python -c "from app.main import VERSION; print(VERSION)")
-                  ACTUAL=$(curl -s http://localhost:5000/version)
-              
-                  echo "Expected: $EXPECTED"
-                  echo "Actual: $ACTUAL"
-              
-                  test "$ACTUAL" = "$EXPECTED"
+          docker run -d -p 5000:5000 --name hivebox hivebox:ci
+          sleep 5
+
+          echo "=== Container Status ==="
+          docker ps -a
+
+          echo "=== Container Logs ==="
+          docker logs hivebox
+
+          EXPECTED=$(python -c "from app.main import VERSION; print(VERSION)")
+          ACTUAL=$(curl -fsS http://localhost:5000/version)
+
+          echo "Expected: $EXPECTED"
+          echo "Actual: $ACTUAL"
+
+          test "$ACTUAL" = "$EXPECTED"
