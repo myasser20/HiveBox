@@ -222,7 +222,10 @@ def is_storage_fresh():
 
         return timedelta(0) <= age <= MAX_AGE
 
-    except Exception:
+    except ( boto3.exceptions.Boto3Error,
+    KeyError,
+    TypeError,
+    ValueError):
         return False
 
 
