@@ -4,4 +4,9 @@ metadata:
   name: hivebox-config
 data:
   SENSEBOX_IDS: "5a905949bc2d4100199012b6" 
-  PORT: "5000"  # Replace with your actual SenseBox port
+  PORT: "5000" 
+  VALKEY_HOST: "valkey-service"
+  VALKEY_PORT: "6379"
+  S3_ENDPOINT: "http://silo-service:9000"
+  S3_BUCKET: "hivebox-data"
+ 

@@ -4,3 +4,6 @@ gunicorn==22.0.0
 pylint
 pytest
 prometheus-client
+valkey
+APScheduler
+boto3
