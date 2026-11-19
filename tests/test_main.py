@@ -22,7 +22,7 @@ def test_version():
 @patch("app.main.BOX_IDS", ["a", "b"])
 @patch("app.main.get_temperature", side_effect=[10.0, 20.0])
 @patch("app.main.cache.get", return_value=None)
-def test_temperature(_mock,cache_mock):
+def test_temperature(_mock):
     """/temperature returns the average and its status."""
     response = client().get("/temperature")
 
@@ -96,7 +96,7 @@ def test_store(mock_store):
 @patch("app.main.are_boxes_available", return_value=True)
 @patch("app.main.is_cache_fresh", return_value=True)
 @patch("app.main.is_storage_fresh", return_value=True)
-def test_readyz(mock_storage, mock_cache, mock_boxes):
+def test_readyz():
     """Ready endpoint returns 200 when all checks pass."""
     response = client().get("/readyz")
 
@@ -107,7 +107,7 @@ def test_readyz(mock_storage, mock_cache, mock_boxes):
 @patch("app.main.are_boxes_available", return_value=False)
 @patch("app.main.is_cache_fresh", return_value=True)
 @patch("app.main.is_storage_fresh", return_value=True)
-def test_readyz_not_ready(mock_storage, mock_cache, mock_boxes):
+def test_readyz_not_ready():
     """Ready endpoint returns 503 when a check fails."""
     response = client().get("/readyz")
 
