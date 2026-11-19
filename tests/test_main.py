@@ -22,7 +22,8 @@ def test_version():
 @patch("app.main.BOX_IDS", ["a", "b"])
 @patch("app.main.get_temperature", side_effect=[10.0, 20.0])
 @patch("app.main.cache.get", return_value=None)
-def test_temperature(_mock):
+@patch("app.main.cache.setex")
+def test_temperature(_setex_mock, _cache_mock, _temperature_mock):
     """/temperature returns the average and its status."""
     response = client().get("/temperature")
 
@@ -30,10 +31,11 @@ def test_temperature(_mock):
     assert float(response.json["average"]) == 15.0
     assert response.json["status"] == "Good"
 
+
 @patch("app.main.BOX_IDS", ["a"])
 @patch("app.main.get_temperature", return_value=None)
 @patch("app.main.cache.get", return_value=None)
-def test_temperature_no_data(_mock,_cache_mock):
+def test_temperature_no_data(_cache_mock, _temperature_mock):
     """/temperature returns 503 when there is no recent data."""
     response = client().get("/temperature")
 
@@ -43,7 +45,8 @@ def test_temperature_no_data(_mock,_cache_mock):
 @patch("app.main.BOX_IDS", ["a"])
 @patch("app.main.get_temperature", return_value=5.0)
 @patch("app.main.cache.get", return_value=None)
-def test_temperature_cold(_mock,_cache_mock):
+@patch("app.main.cache.setex")
+def test_temperature_cold(_setex_mock, _cache_mock, _temperature_mock):
     """Temperature below 10 returns Too Cold."""
     response = client().get("/temperature")
 
@@ -54,7 +57,8 @@ def test_temperature_cold(_mock,_cache_mock):
 @patch("app.main.BOX_IDS", ["a"])
 @patch("app.main.get_temperature", return_value=40.0)
 @patch("app.main.cache.get", return_value=None)
-def test_temperature_hot(_mock,_cache_mock):
+@patch("app.main.cache.setex")
+def test_temperature_hot(_setex_mock, _cache_mock, _temperature_mock):
     """Temperature above 37 returns Too Hot."""
     response = client().get("/temperature")
 
@@ -68,6 +72,7 @@ def test_metrics():
 
     assert response.status_code == 200
     assert b"python_info" in response.data
+
 
 @patch("app.main.update_cache")
 def test_cache(mock_update):
@@ -93,10 +98,12 @@ def test_store(mock_store):
     assert response.status_code == 200
     assert response.json["file"] == "temperature/test.json"
     mock_store.assert_called_once()
+
+
 @patch("app.main.are_boxes_available", return_value=True)
 @patch("app.main.is_cache_fresh", return_value=True)
 @patch("app.main.is_storage_fresh", return_value=True)
-def test_readyz():
+def test_readyz(_storage_mock, _cache_mock, _boxes_mock):
     """Ready endpoint returns 200 when all checks pass."""
     response = client().get("/readyz")
 
@@ -107,7 +114,7 @@ def test_readyz():
 @patch("app.main.are_boxes_available", return_value=False)
 @patch("app.main.is_cache_fresh", return_value=True)
 @patch("app.main.is_storage_fresh", return_value=True)
-def test_readyz_not_ready():
+def test_readyz_not_ready(_storage_mock, _cache_mock, _boxes_mock):
     """Ready endpoint returns 503 when a check fails."""
     response = client().get("/readyz")
 
